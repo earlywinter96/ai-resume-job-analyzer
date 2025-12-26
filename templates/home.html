@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>AI Resume Analyzer | Hemant Solanki</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<!-- ✅ SINGLE NAVBAR -->
+<nav class="navbar">
+    <div class="nav-left">
+        <div class="nav-left">
+            <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="logo-img">
+            <span class="brand">AI Resume & Job Match Analyzer</span>
+        </div>
+        
+    </div>
+
+    <div class="nav-right">
+        <a href="/">Home</a>
+        <a href="/analyze">Analyzer</a>
+        <a href="/">About</a>
+    </div>
+</nav>
+
+<!-- MAIN CONTENT -->
+<div class="container fade-in">
+
+    <!-- HERO SECTION -->
+    <header class="hero" id="about">
+        <h1>AI Resume & Job Match Analyzer</h1>
+
+        <p class="hero-tagline">
+            Most tools optimize resumes.<br>
+            <strong>We help you decide whether to apply, switch roles, or upskill.</strong>
+        </p>
+        
+
+        <p class="subtitle">
+            Built by <span class="highlight">Hemant Solanki</span><br>
+            Senior Data Analyst • AI Generalist • Web Dev
+        </p>
+
+        <p class="description">
+            I design practical AI-powered tools that solve real-world problems in hiring,
+            analytics, and productivity. This platform helps professionals optimize resumes,
+            beat ATS systems, and apply with confidence.
+        </p>
+
+        <!-- CTA -->
+        <a href="/analyze" class="cta-btn">🚀 Try the Analyzer</a>
+
+        <!-- SOCIAL BUTTONS (CENTERED, CLEAN) -->
+        <div class="social-buttons">
+            <a href="https://github.com/earlywinter96" target="_blank">🐙 GitHub</a>
+            <a href="https://www.linkedin.com/in/hemant-solanki-366462199/" target="_blank">💼 LinkedIn</a>
+        </div>
+    </header>
+
+    <!-- FEATURES -->
+    <div class="card features-card">
+        <h2>✨ What This Platform Offers</h2>
+
+        <div class="features-grid">
+            <div class="feature">📊 ATS Resume Match Scoring</div>
+            <div class="feature">🧠 Skill Gap Detection</div>
+            <div class="feature">✍️ Resume Improvement Tips</div>
+            <div class="feature">⚙️ AI + Fallback Intelligence</div>
+            <div class="feature">🔐 Privacy-First Design</div>
+            <div class="feature">💼 Built for Real Job Seekers</div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer>
+        <p>
+            © 2025 • Built by <strong>Hemant Solanki</strong><br>
+            Senior Data Analyst | AI Generalist | Python • SQL • LLMs
+        </p>
+    </footer>
+
+</div>
+
+</body>
+</html>

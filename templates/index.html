@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>AI Resume & Job Match Analyzer</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<script>
+    function openTab(tabId) {
+        document.querySelectorAll('.tab-content').forEach(tab => {
+            tab.classList.remove('active');
+        });
+    
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+    
+        document.getElementById(tabId).classList.add('active');
+        event.target.classList.add('active');
+    }
+    </script>
+
+
+
+<body>
+    <nav class="navbar">
+        <div class="nav-left">
+            <div class="nav-left">
+                <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="logo-img">
+                <span class="brand">AI Resume & Job Match Analyzer</span>
+            </div>
+            
+        </div>
+    
+        <div class="nav-right">
+            <a href="/">Home</a>
+            <a href="/analyze">Analyzer</a>
+            <a href="/">About</a>
+            <a href="https://github.com/earlywinter96/" target="_blank">GitHub</a>
+            <a href="https://www.linkedin.com/in/hemant-solanki-366462199/" target="_blank">LinkedIn</a>
+        </div>
+    </nav>
+    
+
+<div class="container">
+    <header>
+        <h1>AI Resume Analyzer</h1>
+        <p>Optimize your resume. Beat ATS. Get hired faster.</p>
+    </header>
+
+    <div class="card form-card">
+        <form method="POST" enctype="multipart/form-data">
+            <label>📄 Upload Resume (PDF)</label>
+            <input type="file" name="resume" required>
+
+            <label>🧾 Paste Job Description</label>
+            <textarea name="job_description" rows="8" placeholder="Paste the job description here..." required></textarea>
+
+            <button type="submit">Analyze Resume</button>
+        </form>
+        <div class="container fade-in">
+
+    </div>
+
+    {% if result %}
+
+    <div class="card result-card">
+    
+        <!-- TABS -->
+        <div class="tabs">
+            <button class="tab-btn active" onclick="openTab('overview')">📊 Overview</button>
+            <button class="tab-btn" onclick="openTab('skills')">🧩 Skill Match</button>
+            <button class="tab-btn" onclick="openTab('ai')">🧠 AI Suggestions</button>
+        </div>
+    
+        <!-- OVERVIEW TAB -->
+        <div class="tab-content active" id="overview">
+            <div class="score-ring">
+                <svg width="120" height="120">
+                    <circle cx="60" cy="60" r="50"></circle>
+                    <circle cx="60" cy="60" r="50"
+                          class="progress"
+                          style="stroke-dashoffset: {{ 314 - (result.ats_score * 3.14) }}">
+                    </circle>
+                </svg>
+                <div class="score-text">{{ result.ats_score }}%</div>
+            </div>
+    
+            <p class="summary-text">
+                Your resume matches <strong>{{ result.ats_score }}%</strong> of the job requirements.
+                Improve missing skills to increase ATS ranking.
+            </p>
+        </div>
+    
+        <!-- SKILLS TAB -->
+        <div class="tab-content" id="skills">
+            <div class="skill-columns">
+    
+                <div class="skill-box">
+                    <h3>✅ Skills You Have</h3>
+                    {% for skill in result.matched_skills %}
+                        <span class="skill matched">{{ skill }}</span>
+                    {% else %}
+                        <p class="muted">No matching skills found</p>
+                    {% endfor %}
+                </div>
+    
+                <div class="skill-box">
+                    <h3>❌ Skills Required for This Role</h3>
+                    {% for skill in result.missing_skills %}
+                        <span class="skill missing">{{ skill }}</span>
+                    {% else %}
+                        <p class="muted">You match all required skills 🎉</p>
+                    {% endfor %}
+                </div>
+    
+            </div>
+        </div>
+    
+        <!-- AI TAB -->
+        <div class="tab-content" id="ai">
+            <pre class="ai-box">{{ result.gemini_insights }}</pre>
+        </div>
+    
+    </div>
+    
+    {% endif %}
+    
+    
+
+</body>
+</html>
