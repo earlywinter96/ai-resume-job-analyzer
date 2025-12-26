@@ -25,8 +25,8 @@ Resumes are processed temporarily and deleted after analysis. No data is stored.
 **Hemant Solanki**  
 Senior Data Analyst | AI Generalist
 
-- LinkedIn: https://www.linkedin.com/in/hemant-solanki/
-- GitHub: https://github.com/HemantSolanki
+- LinkedIn:[ https://www.linkedin.com/in/hemant-solanki-366462199/]
+- Github: [https://github.com/earlywinter96]
 
 ---
 
