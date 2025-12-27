@@ -62,8 +62,10 @@
 
         <!-- SOCIAL BUTTONS (CENTERED, CLEAN) -->
         <div class="social-buttons">
-            <a href="https://github.com/earlywinter96" target="_blank">🐙 GitHub</a>
-            <a href="https://www.linkedin.com/in/hemant-solanki-366462199/" target="_blank">💼 LinkedIn</a>
+            <a href="https://github.com/earlywinter96" target="_blank"><img src="{{ url_for('static', filename='github.png') }}" class="social-icon">
+            </a>
+            <a href="https://www.linkedin.com/in/hemant-solanki-366462199/" target="_blank"><img src="{{ url_for('static', filename='linkedin.png') }}" class="social-icon">
+            </a>
         </div>
     </header>
 
@@ -90,6 +92,11 @@
     </footer>
 
 </div>
+
+<div class="privacy-banner">
+    🔒 We do not store resumes or job descriptions. All files are deleted immediately after analysis.
+</div>
+
 
 </body>
 </html>

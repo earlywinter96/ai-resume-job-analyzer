@@ -5,7 +5,6 @@
     <title>Analysis Results | AI Resume Analyzer</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
 
@@ -15,7 +14,7 @@
 
 <body>
 
-<!-- 🔗 NAVBAR (Same everywhere) -->
+<!-- NAVBAR -->
 <nav class="navbar">
     <div class="nav-left">
         <img src="{{ url_for('static', filename='logo.png') }}" class="logo-img">
@@ -25,41 +24,39 @@
     <div class="nav-right">
         <a href="/">Home</a>
         <a href="/analyze">Analyzer</a>
-        <a href="/results">Results</a>
+        <a href="/results" class="active">Results</a>
         <a href="https://rxresu.me/" target="_blank" class="highlight-link">
             Fix Resume
         </a>
     </div>
 </nav>
 
+<!-- PRIVACY NOTICE -->
+<div class="privacy-banner">
+    🔒 We do not store resumes or job descriptions. All files are deleted immediately after analysis.
+</div>
 
-<!-- MAIN CONTENT -->
 <div class="container fade-in">
- {% if result.detected_role and result.detected_role != "generic" %}
+
+{% if result %}
+
+<!-- CAREER WARNING -->
+{% if result.detected_role and result.detected_role != "generic" %}
 <div class="career-warning">
     ⚠️ <strong>Career Mismatch Detected</strong><br>
-    Your resume aligns more with a <strong>{{ result.detected_role | capitalize }}</strong> role,
-    while the job you applied for expects a different profile.
+    Your resume aligns more with a <strong>{{ result.detected_role | capitalize }}</strong> role.
 </div>
+{% endif %}
+
+<!-- JOB FIT -->
 <div class="job-fit-card">
     <h3>🎯 Job Fit Recommendation</h3>
-
-    <p>
-        Based on your resume and the job requirements, this role is a:
-    </p>
-
     <span class="job-fit {{ result.job_fit | lower | replace(' ', '-') }}">
         {{ result.job_fit }}
     </span>
 </div>
 
-
-{% endif %}
-
-
-{% if result %}
-
-<!-- 🔹 OVERVIEW CARD -->
+<!-- ATS OVERVIEW -->
 <div class="card result-card">
     <h2>📊 ATS Match Overview</h2>
 
@@ -75,12 +72,12 @@
     </div>
 
     <p class="summary-text">
-        Your resume matches <strong>{{ result.ats_score }}%</strong> of the job requirements.
-        Focus on missing skills and high-impact improvements to increase this score.
+        Your resume matches <strong>{{ result.ats_score }}%</strong> of this job.
+        Focus on high-impact fixes to improve it.
     </p>
 </div>
 
-<!-- 🔹 SKILLS CARD -->
+<!-- SKILLS -->
 <div class="card">
     <h2>🧩 Skill Comparison</h2>
 
@@ -105,24 +102,47 @@
     </div>
 </div>
 
-<!-- 🔹 IMPROVEMENT CARD -->
+<!-- IMPROVEMENT SUMMARY -->
+<div class="card stats-card">
+    <h2>📈 Improvement Summary</h2>
+
+    <div class="stats-grid">
+        <div class="stat-box">
+            <span class="stat-num">{{ result.improvement_stats.resume_fixes }}</span>
+            <span class="stat-label">Resume Fixes</span>
+        </div>
+
+        <div class="stat-box">
+            <span class="stat-num">{{ result.improvement_stats.career_gaps }}</span>
+            <span class="stat-label">Career Gaps</span>
+        </div>
+
+        <div class="stat-box">
+            <span class="stat-num">{{ result.improvement_stats.high_priority }}</span>
+            <span class="stat-label">High Priority</span>
+        </div>
+    </div>
+</div>
+
+<!-- IMPROVEMENTS -->
 <div class="card">
     <h2>🚀 Improvement Plan</h2>
-
 
     {% for item in result.ai_improvements %}
     <div class="improve-card">
         <strong>{{ item.area }}</strong>
+
         <div class="improve-meta">
             <span class="pill priority-{{ item.priority|lower }}">{{ item.priority }} Priority</span>
-            <span class="pill impact-{{ item.expected_impact|lower }}">{{ item.expected_impact }} Impact</span>
+            <span class="pill impact-{{ item.impact|lower }}">{{ item.impact }} Impact</span>
             <span class="pill effort-{{ item.effort|lower }}">{{ item.effort }} Effort</span>
-            <span class="gap-label {{ item.gap_type | lower | replace(' ', '-') }}">{{ item.gap_type }}</span>
-            
+            <span class="gap-label {{ item.gap_type | lower | replace(' ', '-') }}">
+                {{ item.gap_type }}
+            </span>
         </div>
     </div>
     {% else %}
-        <p class="muted">No improvement data available.</p>
+        <p class="muted">No improvement suggestions available.</p>
     {% endfor %}
 </div>
 
@@ -136,6 +156,5 @@
 </footer>
 
 </div>
-
 </body>
 </html>

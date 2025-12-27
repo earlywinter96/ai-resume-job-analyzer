@@ -15,30 +15,40 @@ API_KEY = os.getenv("GOOGLE_API_KEY")
 
 
 # --------------------------------------------------
-# Helper: Safe JSON extractor
+# Helper: Robust JSON extractor (FIXED)
 # --------------------------------------------------
 def extract_json(text: str):
     """
-    Extract JSON object safely from Gemini output.
-    Handles markdown, extra text, and formatting noise.
+    Extract first valid JSON object using brace matching.
+    Handles markdown, extra text, nested objects.
     """
     if not text:
         return None
 
-    text = re.sub(r"```json|```", "", text).strip()
-    match = re.search(r"\{.*\}", text, re.DOTALL)
+    # Remove markdown blocks
+    text = re.sub(r"```.*?```", "", text, flags=re.DOTALL)
 
-    return match.group(0) if match else None
+    stack = []
+    start = None
+
+    for i, ch in enumerate(text):
+        if ch == "{":
+            if not stack:
+                start = i
+            stack.append("{")
+        elif ch == "}":
+            if stack:
+                stack.pop()
+                if not stack and start is not None:
+                    return text[start:i + 1]
+
+    return None
 
 
 # --------------------------------------------------
 # Helper: Gap classification
 # --------------------------------------------------
 def classify_gap(effort: str) -> str:
-    """
-    High effort = Career Gap
-    Low/Medium effort = Resume Fix
-    """
     return "Career Gap" if effort == "High" else "Resume Fix"
 
 
@@ -46,19 +56,18 @@ def classify_gap(effort: str) -> str:
 # Gemini structured insights
 # --------------------------------------------------
 def gemini_insights(resume_text: str, job_description: str):
-    """
-    Uses Gemini to return structured resume insights.
-    Always returns a dict with strengths & improvements.
-    """
     if not API_KEY:
         return {"strengths": [], "improvements": []}
 
     prompt = f"""
-You are a senior ATS consultant.
+STRICT RULES:
+- Output ONLY valid JSON
+- No markdown
+- No explanations
+- No text outside JSON
+- Use double quotes only
 
-Analyze the resume against the job description.
-
-Return ONLY valid JSON in this exact format:
+Required JSON format:
 
 {{
   "strengths": ["string"],
@@ -81,21 +90,27 @@ Job Description:
 
     try:
         client = genai.Client(api_key=API_KEY)
-
         response = client.models.generate_content(
             model="gemini-2.5-flash",
             contents=prompt
         )
 
-        json_text = extract_json(response.text)
+        raw = response.text
+        json_text = extract_json(raw)
 
         if not json_text:
-            raise ValueError("No valid JSON returned by Gemini")
+            raise ValueError("Gemini returned no JSON")
 
-        return json.loads(json_text)
+        data = json.loads(json_text)
+
+        # Validate structure
+        if "strengths" not in data or "improvements" not in data:
+            raise ValueError("Invalid JSON structure")
+
+        return data
 
     except Exception as e:
-        print("🔥 Gemini Error:", e)
+        print("🔥 Gemini JSON Error:", e)
         return {"strengths": [], "improvements": []}
 
 
@@ -103,35 +118,48 @@ Job Description:
 # Final combined analysis
 # --------------------------------------------------
 def analyze_resume(resume_text: str, job_description: str):
-    """
-    Combines rule-based ATS scoring with Gemini insights.
-    Always returns a structured dictionary.
-    """
-
-    # Rule-based ATS stats
     stats = calculate_ats_score(resume_text, job_description)
-
-    # Gemini insights
     ai_data = gemini_insights(resume_text, job_description)
 
-    # ✅ Normalize improvements safely
-    normalized_improvements = []
+    improvements = []
+
     for item in ai_data.get("improvements", []):
         effort = item.get("effort", "Medium")
 
-        normalized_improvements.append({
-            "area": item.get("area", ""),
+        improvements.append({
+            "area": item.get("area", "General improvement"),
             "priority": item.get("priority", "Medium"),
-            "expected_impact": item.get("expected_impact", "Medium"),
+            "impact": item.get("expected_impact", "Medium"),
             "effort": effort,
             "gap_type": classify_gap(effort)
         })
 
+    # --------------------------------------------------
+    # 🔥 GUARANTEED FALLBACK (CRITICAL)
+    # --------------------------------------------------
+    if not improvements:
+        for skill in stats.get("missing_skills", []):
+            improvements.append({
+                "area": f"Add {skill} to resume",
+                "priority": "High",
+                "impact": "High",
+                "effort": "Medium",
+                "gap_type": "Resume Fix"
+            })
+
+    improvement_stats = {
+        "resume_fixes": sum(1 for i in improvements if i["gap_type"] == "Resume Fix"),
+        "career_gaps": sum(1 for i in improvements if i["gap_type"] == "Career Gap"),
+        "high_priority": sum(1 for i in improvements if i["priority"] == "High")
+    }
+
     return {
-        "ats_score": stats["ats_score"],
-        "matched_skills": stats["matched_skills"],
-        "missing_skills": stats["missing_skills"],
+        "ats_score": stats.get("ats_score", 0),
+        "matched_skills": stats.get("matched_skills", []),
+        "missing_skills": stats.get("missing_skills", []),
         "detected_role": stats.get("detected_role", "generic"),
+        "job_fit": stats.get("job_fit", "Unknown"),
         "ai_strengths": ai_data.get("strengths", []),
-        "ai_improvements": normalized_improvements
+        "ai_improvements": improvements,
+        "improvement_stats": improvement_stats
     }
