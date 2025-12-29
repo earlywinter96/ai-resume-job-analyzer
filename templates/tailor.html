@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Resume Tailoring Advisor | AI Resume Analyzer</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+    <div class="nav-left">
+        <img src="{{ url_for('static', filename='logo.png') }}" class="logo-img">
+        <span class="brand">AI Resume & Job Match Analyzer</span>
+    </div>
+
+    <div class="nav-right">
+        <a href="/results">← Back to Results</a>
+        <a href="https://rxresu.me/" target="_blank" class="highlight-link">
+            Fix Resume on RxResume
+        </a>
+    </div>
+</nav>
+
+<!-- MAIN -->
+<div class="container fade-in">
+
+    <!-- HEADER -->
+    <div class="card">
+        <h1>✍️ Resume Tailoring Advisor</h1>
+        <p class="subtitle">
+            We don’t rewrite your resume.<br>
+            We show <strong>what to improve</strong>, <strong>where</strong>, and <strong>why</strong> —
+            so your resume stays authentic and recruiter-safe.
+        </p>
+
+        <p class="muted">
+            🔒 No content is auto-generated. No fake experience. You stay in control.
+        </p>
+    </div>
+
+    <!-- ROLE SUMMARY -->
+    <div class="card">
+        <h2>🎯 Role Alignment Summary</h2>
+
+        <p>
+            <strong>Target Job Role:</strong> {{ result.jd_role | capitalize }}<br>
+            <strong>Your Resume Signals:</strong> {{ result.resume_role | capitalize }}<br>
+            <strong>Overall Fit:</strong>
+            <span class="job-fit {{ result.job_fit | lower | replace(' ', '-') }}">
+                {{ result.job_fit }}
+            </span>
+        </p>
+
+        {% if result.jd_role != result.resume_role %}
+        <div class="career-warning">
+            ⚠️ Your resume emphasizes a different role than this job.
+            Tailoring is recommended before applying.
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- IMPROVEMENT ADVISOR -->
+    <div class="card">
+        <h2>🧠 What to Improve (Guidance Only)</h2>
+
+        {% for item in result.ai_improvements %}
+        <div class="improve-card">
+            <strong>{{ item.area }}</strong>
+
+            <div class="improve-meta">
+                <span class="pill priority-{{ item.priority | lower }}">
+                    {{ item.priority }} Priority
+                </span>
+
+                <span class="pill impact-{{ item.expected_impact | lower }}">
+                    {{ item.expected_impact }} Impact
+                </span>
+
+                <span class="pill effort-{{ item.effort | lower }}">
+                    {{ item.effort }} Effort
+                </span>
+
+                <span class="gap-label {{ item.gap_type | lower | replace(' ', '-') }}">
+                    {{ item.gap_type }}
+                </span>
+            </div>
+
+            <p class="muted">
+                👉 Improve this section by clarifying outcomes, tools used,
+                or relevance to the target role. Avoid adding experience you don’t have.
+            </p>
+        </div>
+        {% else %}
+        <p class="muted">No improvement suggestions available.</p>
+        {% endfor %}
+    </div>
+
+    <!-- ATS CHECKLIST -->
+    <div class="card">
+        <h2>📋 Recruiter-Safe ATS Checklist</h2>
+
+        <ul class="checklist">
+            <li>☑ Place core skills in the top half of your resume</li>
+            <li>☑ Mention tools only once, not everywhere</li>
+            <li>☑ Replace “Worked on” with action verbs</li>
+            <li>☑ Align section headings with job description keywords</li>
+            <li>☑ Avoid stuffing keywords unnaturally</li>
+        </ul>
+    </div>
+
+    <!-- CTA -->
+    <div class="card cta-card">
+        <h2>🚀 Ready to Fix Your Resume?</h2>
+        <p>
+            Use the guidance above to manually update your resume.
+            This keeps your profile authentic and ATS-friendly.
+        </p>
+
+        <a href="https://rxresu.me/" target="_blank" class="cta-btn">
+            ✍️ Fix Resume on RxResume
+        </a>
+    </div>
+
+    <!-- FOOTER -->
+    <footer>
+        <p>
+            © 2025 • Built by <strong>Hemant Solanki</strong><br>
+            Senior Data Analyst | AI Generalist
+        </p>
+    </footer>
+
+</div>
+
+<div class="privacy-banner">
+    🔒 We do not store resumes or job descriptions. All files are deleted immediately after analysis.
+</div>
+
+</body>
+</html>

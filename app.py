@@ -112,6 +112,18 @@ def results():
 
     return render_template("results.html", result=result)
 
+# -------------------------
+# Resume Tailoring Advisor Page
+# -------------------------
+@app.route("/tailor")
+def tailor():
+    result = session.get("result")
+
+    if not result:
+        return redirect(url_for("analyze"))
+
+    return render_template("tailor.html", result=result)
+
 
 # -------------------------
 # App runner (local + Render)

@@ -25,15 +25,13 @@
         <a href="/">Home</a>
         <a href="/analyze">Analyzer</a>
         <a href="/results" class="active">Results</a>
-        <a href="https://rxresu.me/" target="_blank" class="highlight-link">
-            Fix Resume
-        </a>
+        <a href="https://rxresu.me/" target="_blank" class="highlight-link">Fix Resume</a>
     </div>
 </nav>
 
-<!-- PRIVACY NOTICE -->
+<!-- PRIVACY -->
 <div class="privacy-banner">
-    🔒 We do not store resumes or job descriptions. All files are deleted immediately after analysis.
+    🔒 We do not store resumes or job descriptions. All data is deleted immediately after analysis.
 </div>
 
 <div class="container fade-in">
@@ -41,10 +39,11 @@
 {% if result %}
 
 <!-- CAREER WARNING -->
-{% if result.detected_role and result.detected_role != "generic" %}
+{% if result.resume_role and result.jd_role and result.resume_role != result.jd_role %}
 <div class="career-warning">
     ⚠️ <strong>Career Mismatch Detected</strong><br>
-    Your resume aligns more with a <strong>{{ result.detected_role | capitalize }}</strong> role.
+    Your resume aligns more with a <strong>{{ result.resume_role | capitalize }}</strong> role,
+    while this job targets a <strong>{{ result.jd_role | capitalize }}</strong> profile.
 </div>
 {% endif %}
 
@@ -64,16 +63,16 @@
         <svg width="120" height="120">
             <circle cx="60" cy="60" r="50"></circle>
             <circle cx="60" cy="60" r="50"
-                  class="progress"
-                  style="stroke-dashoffset: {{ 314 - (result.ats_score * 3.14) }}">
+                class="progress"
+                style="stroke-dashoffset: {{ 314 - (result.ats_score * 3.14) }}">
             </circle>
         </svg>
         <div class="score-text">{{ result.ats_score }}%</div>
     </div>
 
     <p class="summary-text">
-        Your resume matches <strong>{{ result.ats_score }}%</strong> of this job.
-        Focus on high-impact fixes to improve it.
+        Your resume matches <strong>{{ result.ats_score }}%</strong> of this job’s ATS requirements.
+        Focus on high-impact fixes to improve your chances.
     </p>
 </div>
 
@@ -87,7 +86,7 @@
             {% for skill in result.matched_skills %}
                 <span class="skill matched">{{ skill }}</span>
             {% else %}
-                <p class="muted">No matching skills found</p>
+                <p class="muted">No strong skill matches detected</p>
             {% endfor %}
         </div>
 
@@ -96,7 +95,7 @@
             {% for skill in result.missing_skills %}
                 <span class="skill missing">{{ skill }}</span>
             {% else %}
-                <p class="muted">You meet all required skills 🎉</p>
+                <p class="muted">You meet all core requirements 🎉</p>
             {% endfor %}
         </div>
     </div>
@@ -111,12 +110,10 @@
             <span class="stat-num">{{ result.improvement_stats.resume_fixes }}</span>
             <span class="stat-label">Resume Fixes</span>
         </div>
-
         <div class="stat-box">
             <span class="stat-num">{{ result.improvement_stats.career_gaps }}</span>
             <span class="stat-label">Career Gaps</span>
         </div>
-
         <div class="stat-box">
             <span class="stat-num">{{ result.improvement_stats.high_priority }}</span>
             <span class="stat-label">High Priority</span>
@@ -124,26 +121,77 @@
     </div>
 </div>
 
-<!-- IMPROVEMENTS -->
+<!-- IMPROVEMENT PLAN -->
 <div class="card">
     <h2>🚀 Improvement Plan</h2>
 
     {% for item in result.ai_improvements %}
     <div class="improve-card">
-        <strong>{{ item.area }}</strong>
+        <h3>{{ item.area }}</h3>
 
         <div class="improve-meta">
             <span class="pill priority-{{ item.priority|lower }}">{{ item.priority }} Priority</span>
-            <span class="pill impact-{{ item.impact|lower }}">{{ item.impact }} Impact</span>
+            <span class="pill impact-{{ item.expected_impact|lower }}">{{ item.expected_impact }} Impact</span>
             <span class="pill effort-{{ item.effort|lower }}">{{ item.effort }} Effort</span>
             <span class="gap-label {{ item.gap_type | lower | replace(' ', '-') }}">
                 {{ item.gap_type }}
             </span>
         </div>
+
+        {% if item.why_missing %}
+        <p><strong>Why this matters:</strong> {{ item.why_missing }}</p>
+        {% endif %}
+
+        {% if item.how_to_fix %}
+        <p><strong>How to fix:</strong> {{ item.how_to_fix }}</p>
+        {% endif %}
+
+        {% if item.example_bullet %}
+        <div class="example-box">
+            <strong>Example resume bullet:</strong>
+            <pre>{{ item.example_bullet }}</pre>
+        </div>
+        {% endif %}
     </div>
     {% else %}
         <p class="muted">No improvement suggestions available.</p>
     {% endfor %}
+</div>
+
+<!-- RESUME TAILORING CTA -->
+<div class="card cta-card">
+    <h2>✍️ Tailor Your Resume for This Role</h2>
+    <p>
+        See exactly what to improve — without auto-writing your resume.
+        Safe for recruiters. Optimized for ATS.
+    </p>
+    <a href="/tailor" class="cta-btn">🔍 Open Resume Tailoring Advisor</a>
+</div>
+
+<!-- JOB RECOMMENDATIONS -->
+<div class="card">
+    <h2>💼 Jobs You’re Likely to Get</h2>
+
+    {% for job in result.recommended_jobs %}
+    <div class="job-card">
+        <strong>{{ job.title }}</strong><br>
+        <span class="muted">{{ job.company }} • {{ job.location }}</span>
+
+        <div class="job-meta">
+            <span class="pill match">{{ job.score }}% Match</span>
+            <a href="{{ job.url }}" target="_blank" class="apply-btn">Apply</a>
+        </div>
+    </div>
+    {% else %}
+        <p class="muted">
+            No very high-fit roles yet. Improve your resume and recheck — results update instantly.
+        </p>
+    {% endfor %}
+</div>
+
+<div class="info-banner">
+    💡 Job recommendations are based on your <strong>resume profile</strong>,
+    not the pasted job description.
 </div>
 
 {% endif %}
@@ -151,7 +199,7 @@
 <footer>
     <p>
         © 2025 • Built by <strong>Hemant Solanki</strong><br>
-        Senior Data Analyst | AI Generalist
+        AI Resume & Career Decision Platform
     </p>
 </footer>
 
